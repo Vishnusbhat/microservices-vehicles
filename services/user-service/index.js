@@ -8,4 +8,4 @@ const port = 3001;
 
 app.listen(port, () => {
     console.log(`Service User: Listening on port ${port}`);
-})
+});
