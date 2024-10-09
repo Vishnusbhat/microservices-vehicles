@@ -64,7 +64,8 @@ const userSchema = mongoose.Schema({
     },
     vehicles: {
         type: [mongoose.Schema.Types.ObjectId],
-        required: false
+        required: false,
+        ref: 'vehicles'
     }
 });
 
@@ -84,7 +85,7 @@ const auth = ( req, res, next ) => {
     console.log(authHeader);
     if (!authHeader) res.status(501).send('auth header missing!');
     const token = authHeader.split(' ')[0];
-    const user = jwt.verify(authHeader, '10');
+    const user = jwt.verify(authHeader, secret);
     console.log(user);
     next();
 }
@@ -93,7 +94,7 @@ const auth = ( req, res, next ) => {
 app.post('/user/signup', async (req, res) => {
     console.log(req.body);
     try {
-        const { name, email, password, phone } = req.body;
+        const { name, email, password, phone, address } = req.body;
 
         const user = await User.findOne({ email });
         if (user) {
@@ -101,7 +102,7 @@ app.post('/user/signup', async (req, res) => {
             return res.status(401).json('User found! Proceed to login.');
         }
 
-        const newUser = new User({ name, email, password, phone });
+        const newUser = new User({ name, email, password, phone, address });
         await newUser.save();
         console.log('New user created.');
 
@@ -113,6 +114,17 @@ app.post('/user/signup', async (req, res) => {
         console.log('Failed to send the token to the client: ' + error.message);
         return res.status(500).json({ error: 'Internal Server Error' });
     }
+});
+
+app.post('/user/:vehicle', auth, async (req, res) => {
+    const token = req.headers['authorization'];
+    const user = jwt.verify(token, secret);
+    const vehicleID = req.params.vehicle;
+    await User.updateOne(
+        { email: user.email },
+        { $addToSet: {vehicles: vehicleID}}
+    )
+    return res.json('VehicleID ' + vehicleID + ' has been added to user with the email ' + user.email);
 });
 
 
