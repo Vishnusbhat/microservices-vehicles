@@ -34,6 +34,16 @@ const vehicleSchema = new Schema({
     mileage: {
         type: Number
     },
+    listed: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    rented: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
     createdAt: {
         type: Date,
         default: Date.now
