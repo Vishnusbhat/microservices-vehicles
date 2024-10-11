@@ -14,7 +14,7 @@ const uri =  'mongodb+srv://user:user@cluster0.k4iy6.mongodb.net/User?retryWrite
 const connectDB = async () => {
     try {
         await mongoose.connect(uri);
-        console.log('MongoDB connected successfully.');
+        console.log('User Service: MongoDB connected successfully.');
     } catch (err)   {
         console.log('Error connecting to DB: ' + err.message);
         process.exit(1);
@@ -82,11 +82,10 @@ app.use((err, req, res, next) => {
 
 const auth = async ( req, res, next ) => {
     console.log('Auth function running.');
-    const authHeader = req.headers['authorization'];
-    console.log(authHeader);
-    if (!authHeader) res.status(501).send('auth header missing!');
-    const token = authHeader.split(' ')[0];
-    const user = jwt.verify(authHeader, secret);
+    const token = req.headers['authorization'];
+    console.log(token);
+    if (!token) res.status(501).send('auth header missing!');
+    const user = jwt.verify(token, secret);
     const fullUserDetails = await User.findOne({email: user.email});
     console.log(fullUserDetails);
     req.user = fullUserDetails;
@@ -132,17 +131,33 @@ app.post('/user/login', async (req, res) => {
     return res.json({token, 'message': 'login successful.'});
 });//used to login to an existing user. A new token will be returned.
 
-app.post('/user/:vehicle(\\d+)', auth, async (req, res) => {
-    const token = req.headers['authorization'];
-    const user = jwt.verify(token, secret);
+app.post('/user/vehicle/:vehicle', auth, async (req, res) => {
     const vehicleID = req.params.vehicle;
-    const userID = User.findOne({email: user.email});
+    const user = req.user;
     await User.updateOne(
-        { email: user.email },
-        { $addToSet: {vehicles: vehicleID}}
+        { _id: user._id },
+        { $addToSet: {vehicles: vehicleID}}, {new: true}
     )
-    return res.status(200).json({'userID' : userID});
+    return res.status(200).json({'userID' : user._id});
 });//when a new vehicle is added by a user, the vehicle service will talk to user service to get the user ID and also provide the vehicle ID to be added into the 'Vehicles' array in the user schema.
+
+app.delete('/user/vehicle/delete/:vid', auth, async ( req, res ) => {
+    console.log("running function to delete entry from the array.");
+    const vID = req.params.vid;
+    console.log(vID);
+    const userID = req.user._id;
+    try {
+        const deleteVehicle = await User.updateOne(
+            {_id: userID},
+            {$pull: { vehicles: vID}}
+        );
+        console.log('Vehicle deleted from the user list.');
+        return res.status(200).json("Vehicle deleted from the user list.");
+    } catch (error){
+        console.log ('Error deleting vehicle from the user collection: ' + error.message);
+        return res.status(500).json("Error deleting the vehicle from the user list.");
+    }
+}); 
 
 app.get('/user/details', auth, (async ( req, res ) => {
     console.log('Sending user details...');
