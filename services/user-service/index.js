@@ -167,7 +167,7 @@ app.put('/user/update', auth, async ( req, res ) => {
     const updateData = req.body;
     await User.updateOne({_id: user._id }, { $set: updateData });
     return res.status(201).json({"message": "Updated the data:", "Updated data" : updateData});
-});
+});//to update any section of the user document. It can update only one section of the document while all the other parts are left untouched.
 
 
 app.listen(port, () => {
