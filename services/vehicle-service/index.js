@@ -253,11 +253,52 @@ app.get('/vehicle/booking', auth, async ( req, res ) => {
     }
 });//to get all the bookings of a user
 
+app.post('/vehicle/review', auth, async ( req, res ) => {
+    const { stars, vehicleID, _id } = req.body;
+    const vehicle = await Vehicle.findOne({_id: vehicleID});
+    console.log(vehicle);
+    const currentStarSum = vehicle.totalStars + stars;
+    const reviewCount = vehicle.reviewCount + 1;
+     try {
+        await vehicle.updateOne({
+            $set: {
+                totalStars: currentStarSum, 
+                reviewCount: reviewCount
+            },
+            $push: {
+                reviews: _id
+            }
+        });
+        return res.status(200).json("Review added successfully to vehicle collection.");
+     }catch (error){
+        console.log("Error adding the review into vehicle collection: " + error.message);
+        return res.status(501).json("Error adding the review into vehicle collection.");
+     }
+});//to add new reviews, will add the total star count and number of reviews, pushes the review_id into the review list
 
-
-
-
-
+app.put('/vehicle/review/:vehicleID', auth, async ( req, res ) => {
+    const vehicleID = req.params.vehicleID;
+    const { stars, reviewID } = req.body;
+    const vehicle = await Vehicle.findOne({_id: vehicleID});
+    console.log(vehicle);
+    const currentStarSum = vehicle.totalStars - stars;
+    const reviewCount = vehicle.reviewCount - 1;
+     try {
+        await vehicle.updateOne({
+            $set: {
+                totalStars: currentStarSum, 
+                reviewCount: reviewCount
+            },
+            $pull: {
+                reviews: reviewID
+            }
+        });
+        return res.status(200).json("Review deleted successfully from vehicle collection.");
+     }catch (error){
+        console.log("Error deleing the review from vehicle collection: " + error.message);
+        return res.status(501).json("Error deleting the review from vehicle collection.");
+     }
+});
 
 app.listen(port, () => {
     console.log(`Vehicle Service: Listening on port ${port}`);

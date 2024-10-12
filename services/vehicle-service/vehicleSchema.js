@@ -47,6 +47,21 @@ const vehicleSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    reviews: {
+        type: [mongoose.Schema.Types.ObjectId],
+        required: false,
+        ref: 'reviews'
+    },
+    reviewCount: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    totalStars: {
+        type: Number,
+        required: true,
+        default: 0
     }
 });
 
