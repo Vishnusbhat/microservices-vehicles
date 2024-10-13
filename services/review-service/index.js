@@ -138,8 +138,26 @@ app.post('/review/comment/:reviewID', auth, async ( req, res ) => {
 });
 
 //delete a comment
-app.post('/review/comment/:reviewID', auth, async ( req, res ) => {
-    
+app.delete('/review/comment/:commentID', auth, async ( req, res ) => {
+    const commentID = req.params.commentID;
+    const user = req.user;
+    try {
+        const comment = await Comment.findById(commentID);
+        if (user._id.toString() !== comment.userID.toString())
+            return res.status(500).json("Not Authorised.");
+        const review = await Review.findById(comment.ReviewID);
+        if (review.comments.length == 1 && review.deleted){
+            await review.deleteOne();
+        }else{
+            await comment.deleteOne();
+            await review.updateOne({$pull: {comments: commentID}});
+        }
+        console.log("Comment deleted.");
+        return res.status(200).json("Comment deleted.");
+    }catch (error){
+        console.log("Error deleting the comment: " + error.message);
+        return res.status(500).json("Error deleting the comment.");
+    }
 });
 
 //get all reviews for a vehicle
@@ -157,9 +175,15 @@ app.get('/review/:vehicleID', async ( req, res ) => {
 
 //get all comments for a review
 app.get('/review/comment/:reviewID', auth, async ( req, res ) => {
-    const reveiwID = req.params.reviewID;
-    const review = await Review.findById(reveiwID);
-    
+    const reviewID = req.params.reviewID;
+    try{
+        const comments = await Comment.find({ReviewID: reviewID});
+        console.log("Comments found for the review.");
+        return res.status(200).json(comments);
+    }catch (error){
+        console.log("Error getting the comments: " + error.message);
+        return res.status(500).json("Error getting the comments.");
+    }
 });
 
 
