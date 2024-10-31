@@ -1,10 +1,12 @@
 const express = require('express');
+const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(cors());
 const mongoose = require('mongoose');
 
 const uri =  'mongodb+srv://user:user@cluster0.k4iy6.mongodb.net/User?retryWrites=true&w=majority&appName=Cluster0';
@@ -123,12 +125,16 @@ app.post('/user/login', async (req, res) => {
         console.log('User does not exist. Please Signup.');
         return res.status(404).json('User not found!');
     }
+    if (password !== user.password){
+        console.log('Wrong Password');
+        return res.status(401).json('Wrong Password!');
+    }
     const token = jwt.sign({
         'name': user.name,
         'email': user.email
     }, secret, {expiresIn: '30m'});
     console.log('Login successful.');
-    return res.json({token, 'message': 'login successful.'});
+    return res.json({token, user, 'message': 'login successful.'});
 });//used to login to an existing user. A new token will be returned.
 
 app.post('/user/vehicle/:vehicle', auth, async (req, res) => {
