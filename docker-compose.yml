@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx-reverse-proxy
+    ports:
+      - "3000:3000"      # Expose Nginx on port 3000
+    volumes:
+      - ./nginx.conf:/nginx/nginx.conf  # Map custom Nginx config
+    depends_on:
+      - user
+      - vehicle
+      - client  # Add client to dependencies
+    networks:
+      - app-network
+    restart: unless-stopped  # Restart policy
+
+  user:
+    image: user-service
+    container_name: user
+    environment:
+      - MONGO_URI=mongodb+srv://user:user@cluster0.k4iy6.mongodb.net/User?retryWrites=true&w=majority&appName=Cluster0  # Example of DB connection
+      - JWT_SECRET=vishnu@260403
+    ports:
+      - "3001:3001"      # Service port
+    networks:
+      - app-network
+    restart: unless-stopped  # Restart policy
+
+  vehicle:
+    image: vehicle-service
+    container_name: vehicle
+    environment:
+      - MONGO_URI=mongodb+srv://user:user@cluster0.k4iy6.mongodb.net/Vehicles?retryWrites=true&w=majority&appName=Cluster0
+      - JWT_SECRET=vishnu@260403
+    ports:
+      - "3002:3002"
+    networks:
+      - app-network
+    restart: unless-stopped  # Restart policy
+
+  # Uncomment and configure this if you have a review service
+  # review:
+  #   image: your-review-service-image
+  #   container_name: review
+  #   environment:
+  #     - MONGO_URI=mongodb://mongo:27017/reviewdb
+  #     - JWT_SECRET=your_jwt_secret
+  #   ports:
+  #     - "3003:3003"
+  #   networks:
+  #     - app-network
+  #   restart: unless-stopped  # Restart policy
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db  # Volume for MongoDB persistence
+    networks:
+      - app-network
+    restart: unless-stopped  # Restart policy
+
+  client:
+    image: client  # Replace with your client image name
+    container_name: client-container
+    build:
+      context: ./client  # Specify the context path for building the client image
+    ports:
+      - "3003:80"  # Expose client port, adjust if necessary
+    networks:
+      - app-network
+    restart: unless-stopped  # Restart policy
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:

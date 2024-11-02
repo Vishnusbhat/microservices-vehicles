@@ -14,7 +14,7 @@ const List = require('./listSchema');
 const Booking = require('./bookingSchema');
 const secret = process.env.SECRET_TOKEN_KEY;
 const uri = 'mongodb+srv://user:user@cluster0.k4iy6.mongodb.net/Vehicles?retryWrites=true&w=majority&appName=Cluster0';
-const port = process.env.PORT;
+const port = 3002;
 
 
 {
@@ -40,24 +40,36 @@ mongoose.connection.on('SIGINT', async () => {
 });
 }//to connect to MongoDB
 
-const auth = async ( req, res, next ) => {
+const auth = async (req, res, next) => {
     const token = req.headers['authorization'];
-    if (!token) return res.status(500).json("auth header missing!");
-    const user = jwt.verify(token, secret);
-    if (!user) return res.status(500).json("No user is attached to the request!");
-    
-    //add a call to get user object from email.
-    const fullUserDetails = await axios.get('http://localhost:3001/user/details', 
-        {
-                headers: {
+    if (!token) return res.status(400).json("Auth header missing!");
+
+    try {
+        const user = jwt.verify(token, secret); // Verify the token
+        if (!user) return res.status(401).json("No user is attached to the request!");
+
+        // Fetch the full user details using the token
+        const fullUserDetails = await axios.get('http://localhost:3001/user/details', {
+            headers: {
                 'authorization': `${token}`
             }
+        });
+        
+        req.user = fullUserDetails.data.user;
+        console.log('Authentication completed.');
+        next();
+    } catch (error) {
+        if (error.name === 'TokenExpiredError') {
+            return res.status(401).json("Token has expired. Please log in again.");
+        } else if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json("Invalid token. Please log in again.");
+        } else {
+            console.error('Authentication error:', error);
+            return res.status(500).json("An error occurred during authentication.");
         }
-    );
-    req.user = fullUserDetails.data.user;
-    console.log('Authentication completed.');
-    next();
-}//to authorize the user and authenticate. Also assigns the req.user property.
+    }
+};
+//to authorize the user and authenticate. Also assigns the req.user property.
 
 app.post('/vehicle', auth, async ( req, res ) => {
     const userID = req.user._id;
@@ -110,7 +122,7 @@ app.delete('/vehicle/:vehicle', auth, async ( req, res ) => {
 
 app.get('/vehicle', async ( req, res ) => {
     try {
-        const vehicles = await Vehicle.find({}, {_id: 1, name: 1, model: 1, brand: 1, year: 1, color: 1, milage: 1});
+        const vehicles = await Vehicle.find({}, {_id: 1, name: 1, model: 1, brand: 1, year: 1, color: 1, milage: 1, owner: 1});
         console.log("Vehicle list retrieved.");
         console.log(vehicles);
         return res.status(200).json(vehicles);
@@ -119,6 +131,17 @@ app.get('/vehicle', async ( req, res ) => {
     }
     
 });//get the list of all the vehicles with minimal details to display, no authentication needed
+
+app.get('/vehicle/owner/:userId', async (req, res) => {
+    try {
+      const vehicles = await Vehicle.find({ owner: req.params.userId });
+      res.json(vehicles);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send('Server error');
+    }
+  });
+  
 
 app.put(`/vehicle/:vehicleID`, auth, async ( req, res ) => {
     const user = req.user;
@@ -149,7 +172,8 @@ app.post('/vehicle/list/:vehicleID', auth, async ( req, res ) => {
         location: location,
         maxSpeed: maxSpeed,
         name: vehicle.name,
-        vehicleID: vehicleID
+        vehicleID: vehicleID,
+        userID: userID
     });
     console.log(vehicle);
 
@@ -194,6 +218,21 @@ app.get('/vehicle/list', async ( req, res ) => {
         return res.status(500).json("Error while listing the lists.");
     }
 });//to list all the listing || does not require auth.
+
+app.get('/vehicle/listings/:userId', auth, async (req, res) => {
+    const { userId } = req.params; // Extract the userId from the route parameters
+
+    try {
+        // Find listings where the userID matches the provided userId
+        const listings = await List.find({ userID: userId });
+        console.log(`Listings retrieved for user ${userId}.`);
+        return res.status(200).json(listings); // Return the listings with a 200 status
+    } catch (error) {
+        console.log("Error while retrieving user listings: " + error.message);
+        return res.status(500).json({ message: "Error while retrieving listings." }); // Return an error message with a 500 status
+    }
+});
+
 
 app.post('/vehicle/booking/:vehicleID', auth, async ( req, res ) => {
     const vehicleID = req.params.vehicleID;

@@ -11,6 +11,11 @@ const listSchema = new Schema({
         required: true,
         ref: 'vehicles'
     },
+    userID: {    
+        type: mongoose.Types.ObjectId,
+        required: true,
+        ref: 'user'
+    },
     price: {    
         type: Number,
         required: true

@@ -13,12 +13,12 @@ const Login = () => {
         e.preventDefault();
     
         try {
-            const response = await axios.post('http://localhost:3001/user/login', { 
+            const response = await axios.post('http://localhost:3000/user/login', { 
                 email,
                 password,
             });
             const { user, token } = response.data;
-            console.log(user);
+            console.log(user._id);
             setUser(user); 
             localStorage.setItem('token', token); 
             navigate('/');

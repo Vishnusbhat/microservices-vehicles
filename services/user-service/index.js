@@ -75,7 +75,7 @@ const User = mongoose.model('User', userSchema);
 
 require('dotenv').config();
 const port = 3001;
-const secret = process.env.SECRET_TOKEN_KEY;
+const secret = "vishnu@260403";
 
 app.use((err, req, res, next) => {
     if (err instanceof Error) console.log('Server Error: ' + err.message);
