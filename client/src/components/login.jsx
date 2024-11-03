@@ -13,7 +13,7 @@ const Login = () => {
         e.preventDefault();
     
         try {
-            const response = await axios.post('http://localhost:3000/user/login', { 
+            const response = await axios.post('http://43.204.212.234:3000/user/login', { 
                 email,
                 password,
             });

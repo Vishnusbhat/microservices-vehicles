@@ -16,7 +16,7 @@ const AddVehicleForm = () => {
     const token = localStorage.getItem('token'); // Retrieve token from local storage
 
     try {
-      const response = await axios.post('http://localhost:3000/vehicle', newVehicle, {
+      const response = await axios.post('http://43.204.212.234:3000/vehicle', newVehicle, {
         headers: {
           Authorization: `${token}`, // Include token in the request headers
         },

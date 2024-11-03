@@ -13,7 +13,7 @@ const VehicleModal = ({ vehicle, onClose, onVehicleUpdate }) => {
     const token = localStorage.getItem('token');
     try {
       await axios.put(
-        `http://localhost:3000/vehicle/${vehicle._id}`,
+        `http://43.204.212.234:3000/vehicle/${vehicle._id}`,
         editedVehicle,
         { headers: { Authorization: token } }
       );
@@ -26,7 +26,7 @@ const VehicleModal = ({ vehicle, onClose, onVehicleUpdate }) => {
 
   const handleDeleteVehicle = async () => {
     try {
-      await axios.delete(`http://localhost:3000/vehicle/${vehicle._id}`, {
+      await axios.delete(`http://43.204.212.234:3000/vehicle/${vehicle._id}`, {
         headers: {
           Authorization: `${localStorage.getItem('token')}`,
         },

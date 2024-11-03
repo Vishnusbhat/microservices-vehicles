@@ -19,7 +19,7 @@ const ProfileView = ({ user }) => {
   const fetchOwnedVehicles = async () => {
     if (!user) return;
     try {
-      const response = await axios.get(`http://localhost:3000/vehicle/owner/${user._id}`, {
+      const response = await axios.get(`http://43.204.212.234:3000/vehicle/owner/${user._id}`, {
         headers: {
           Authorization: `${localStorage.getItem('token')}`,
         },
@@ -33,7 +33,7 @@ const ProfileView = ({ user }) => {
   const fetchListings = async () => {
     if (!user) return;
     try {
-      const response = await axios.get(`http://localhost:3000/vehicle/listings/${user._id}`, {
+      const response = await axios.get(`http://43.204.212.234:3000/vehicle/listings/${user._id}`, {
         headers: {
           Authorization: `${localStorage.getItem('token')}`,
         },
@@ -46,7 +46,7 @@ const ProfileView = ({ user }) => {
 
   const handleDeleteListing = async (vehicleID) => {
     try {
-      await axios.delete(`http://localhost:3000/vehicle/list/${vehicleID}`, {
+      await axios.delete(`http://43.204.212.234:3000/vehicle/list/${vehicleID}`, {
         headers: {
           Authorization: `${localStorage.getItem('token')}`,
         },

@@ -15,7 +15,7 @@ const MainContent = ({ selectedOption, setSelectedVehicle, user, fromDate, toDat
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/vehicle/list'); // Adjust to your actual endpoint
+        const response = await axios.get('http://43.204.212.234:3000/vehicle/list'); // Adjust to your actual endpoint
         setListings(response.data);
       } catch (error) {
         console.error('Error fetching listings:', error);
