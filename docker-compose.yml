@@ -54,7 +54,7 @@ services:
   #   restart: unless-stopped  # Restart policy
 
   mongo:
-    image: mongo:latest
+    image: mongo:noble # Use the Alpine version for MongoDB
     container_name: mongo
     ports:
       - "27017:27017"
