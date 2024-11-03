@@ -44,7 +44,7 @@ const MainContent = ({ selectedOption, setSelectedVehicle, user, fromDate, toDat
     <main className="col-span-10 p-6 flex flex-col">
       {selectedOption === 'home' && (
         <div>
-          <h2 className="text-3xl font-bold mb-6 lg:ml-40 md:ml-40">Home</h2>
+          <h2 className="text-3xl font-bold mb-6 lg:ml-40 md:ml-44">Home</h2>
           {!user ? (
             <div className="text-center">
               <p className="mb-4 text-lg">Please log in to book vehicles.</p>
@@ -58,7 +58,7 @@ const MainContent = ({ selectedOption, setSelectedVehicle, user, fromDate, toDat
           ) : (
             <div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 lg:ml-40 md:ml-40">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4 lg:ml-40 md:ml-44">
               {listings
                 .filter((listing) => listing.userID && user._id && listing.userID.toString() !== user._id.toString())
                 .map((listing) => (
@@ -83,7 +83,7 @@ const MainContent = ({ selectedOption, setSelectedVehicle, user, fromDate, toDat
       {selectedOption === 'vehicles' && (
         <div>
           <h2 className="text-3xl font-bold mb-6 lg:ml-40 md:ml-40">Available Vehicles</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:ml-40 md:ml-40">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:ml-40 md:ml-44">
             {listings.map((listing) => (
               <VehicleCard
                 key={listing._id}
@@ -99,8 +99,8 @@ const MainContent = ({ selectedOption, setSelectedVehicle, user, fromDate, toDat
       {selectedOption === 'profile' && <ProfileView user={user} />}
       {selectedOption === 'bookings' && (
         <div>
-          <h2 className="text-3xl font-bold mb-6">Bookings</h2>
-          <p>List of bookings will be shown here.</p>
+          <h2 className="text-3xl font-bold mb-6 lg:ml-40 md:ml-44">Bookings</h2>
+          <p className='lg:ml-40 md:ml-44'>List of bookings will be shown here.</p>
         </div>
       )}
 

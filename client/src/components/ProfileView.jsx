@@ -104,11 +104,11 @@ const ProfileView = ({ user }) => {
   }
 
   return (
-    <div className="bg-gray-900 text-gray-300 p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
+    <div className="bg-gray-900 text-gray-300 p-8 rounded-lg shadow-lg max-w-4xl mx-auto lg:ml-40 md:ml-44">
       <h2 className="text-3xl font-bold text-blue-400 mb-6">User Profile</h2>
       <UserInfo user={user} />
 
-      <div className="mt-6 mb-4 flex space-x-4">
+      <div className="mt-6 mb-4 flex flex-col space-y-4 content-evenly justify-evenly items-center sm:flex-row sm:space-y-0 sm:space-x-4">
         <button 
           onClick={handleAddToListClick} 
           className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
@@ -124,7 +124,6 @@ const ProfileView = ({ user }) => {
       </div>
       
       <div className="mt-4">
-        <h3 className="text-xl font-semibold text-gray-200 mb-2">Owned Vehicles</h3>
         <OwnedVehicles vehicles={ownedVehicles} onVehicleClick={handleVehicleClick} />
       </div>
       

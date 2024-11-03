@@ -27,7 +27,7 @@ const Sidebar = ({ fromDate, setFromDate, toDate, setToDate }) => {
       <aside
         className={`fixed inset-y-0 left-0 bg-gray-800 p-6 text-white transform ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } transition-transform duration-300 ease-in-out md:relative md:translate-x-0 md:block w-64 z-10`}
+        } transition-transform duration-300 ease-in-out h-full md:relative md:translate-x-0 md:block w-64 z-10`}
       >
         <h2 className="text-xl font-semibold mb-4">Select Date Range</h2>
 
